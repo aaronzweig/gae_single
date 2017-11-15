@@ -218,7 +218,8 @@ for test in range(FLAGS.test_count):
         sys.stdout.flush()
         if FLAGS.save:
             np.save("emb", test_embs[arg])
-        break
+        if FLAGS.verbose:
+            break
 if not FLAGS.verbose:
     print((np.mean(rocs), stats.sem(rocs)))
     print((np.mean(aps), stats.sem(aps)))

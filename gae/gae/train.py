@@ -211,10 +211,11 @@ for test in range(FLAGS.test_count):
     rocs[test] = test_rocs[arg]
     aps[test] = test_aps[arg]
 
-    if FLAGS.verbose:
+    if FLAGS.verbose or dataset_str == 'pubmed':
         print(arg)
         print(test_rocs[arg])
         print(test_aps[arg])
+        sys.stdout.flush()
         if FLAGS.save:
             np.save("emb", test_embs[arg])
         break

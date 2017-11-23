@@ -136,18 +136,13 @@ class GCNModelFeedback(GCNModelVAE):
                                               dropout=self.dropout,
                                               logging=self.logging)
 
-        if FLAGS.scale:
-          l3 = ScaledInnerProductDecoder(input_dim=FLAGS.hidden2,
-                                        act=lambda x: x,
-                                        logging=self.logging)
-        else:
-          l3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
-                                        act=lambda x: x,
-                                        logging=self.logging)
+        l3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+                                      act=lambda x: x,
+                                      logging=self.logging)
+
+        self.weight_norm = FLAGS.w0 * l0.vars['weights'] + FLAGS.w1 * l1.vars['weights'] +  FLAGS.w2 * l2.vars['weights']
 
         znorm = z
-        if FLAGS.normalize:
-          znorm = tf.nn.l2_normalize(z, dim = 1)
 
         recon = l3(znorm)
         recon = tf.nn.sigmoid(recon)
@@ -159,8 +154,6 @@ class GCNModelFeedback(GCNModelVAE):
         update = l2((update, recon, z))
 
         update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        if FLAGS.normalize:
-          update = tf.nn.l2_normalize(update, 1)
 
         reconstructions = l3(update)
 

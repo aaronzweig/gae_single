@@ -184,7 +184,7 @@ for test in range(FLAGS.test_count):
             adj_norm_mini = adj_norm
 
         if FLAGS.anneal:
-            temp = min(FLAGS.autoregressive_scalar, 1.0 * epoch / FLAGS.epochs)
+            temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)
         else:
             temp = FLAGS.autoregressive_scalar
 

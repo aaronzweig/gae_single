@@ -183,16 +183,16 @@ for test in range(FLAGS.test_count):
         else:
             adj_norm_mini = adj_norm
 
-        if FLAGS.anneal:
-            temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)
-        else:
-            temp = FLAGS.autoregressive_scalar
-
         feed_dict = construct_feed_dict(adj_norm_mini, adj_label, features, placeholders)
         feed_dict.update({placeholders['dropout']: FLAGS.dropout})
         feed_dict.update({placeholders['auto_dropout']: FLAGS.auto_dropout})
         feed_dict.update({placeholders['temp']: temp})
         outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
+
+        if FLAGS.anneal:
+            temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)
+        else:
+            temp = FLAGS.autoregressive_scalar
 
         avg_cost = outs[1]
         avg_accuracy = outs[2]

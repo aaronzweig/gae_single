@@ -79,6 +79,7 @@ def deepwalk(adj):
 
 
 for k in range(FLAGS.test_count):
+    print(k)
 
     adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = get_test_edges(adj_def)
     val_edges = tuple(zip(*val_edges))

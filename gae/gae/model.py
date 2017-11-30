@@ -155,8 +155,8 @@ class GCNModelFeedback(GCNModelVAE):
         update = l1((z, recon, z)) + l0((self.inputs, recon, z))
         update = l2((update, recon, z))
 
-        update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        # update = (1 - self.temp) * z + self.temp * update
+        # update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
+        update = (1 - self.temp) * z + self.temp * update
 
         reconstructions = l3(update)
 

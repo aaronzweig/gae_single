@@ -189,8 +189,8 @@ for test in range(FLAGS.test_count):
         feed_dict.update({placeholders['temp']: temp})
         outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
-        if FLAGS.anneal:
-            temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)
+        if FLAGS.anneal and epoch < 50:
+            temp = 0.
         else:
             temp = FLAGS.autoregressive_scalar
 

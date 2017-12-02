@@ -54,6 +54,7 @@ flags.DEFINE_integer('features', 0, 'Whether to use features (1) or not (0).')
 flags.DEFINE_integer('gpu', -1, 'Which gpu to use')
 flags.DEFINE_integer('seeded', 1, 'Set numpy random seed')
 flags.DEFINE_integer('scale', 0, 'use scaled inner prod')
+flags.DEFINE_integer('connected_split', 1, 'use split with training set always connected')
 
 
 if FLAGS.seeded:
@@ -84,7 +85,11 @@ rocs = np.zeros(FLAGS.test_count)
 aps = np.zeros(FLAGS.test_count)
 
 for test in range(FLAGS.test_count):
-    adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = get_test_edges(adj_def)
+    func = get_test_edges
+    if FLAGS.connected_split == 0:
+        func = mask_test_edges
+        
+    adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = func(adj_def)
     val_edges = tuple(zip(*val_edges))
     val_edges_false = tuple(zip(*val_edges_false))
     test_edges = tuple(zip(*test_edges))

@@ -31,6 +31,7 @@ flags.DEFINE_integer('features', 0, 'Whether to use features (1) or not (0).')
 flags.DEFINE_integer('seeded', 1, 'Set numpy random seed')
 flags.DEFINE_integer('test_count', 10, 'Set num tests')
 flags.DEFINE_integer('emb_size', 128, 'Number of eigenvectors for embedding')
+flags.DEFINE_integer('connected_split', 1, 'use split with training set always connected')
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -62,7 +63,11 @@ aps = np.zeros(FLAGS.test_count)
 
 for k in range(FLAGS.test_count):
 
-    adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = get_test_edges(adj_def)
+    func = get_test_edges
+    if FLAGS.connected_split == 0:
+        func = mask_test_edges
+
+    adj_train, train_edges, val_edges, val_edges_false, test_edges, test_edges_false = func(adj_def)
     val_edges = tuple(zip(*val_edges))
     val_edges_false = tuple(zip(*val_edges_false))
     test_edges = tuple(zip(*test_edges))

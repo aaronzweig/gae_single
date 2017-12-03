@@ -140,10 +140,6 @@ class GCNModelFeedback(GCNModelVAE):
                                       act=lambda x: x,
                                       logging=self.logging)
 
-        self.weight_norm += FLAGS.w0 * tf.nn.l2_loss(l0.vars['weights'])
-        self.weight_norm += FLAGS.w1 * tf.nn.l2_loss(l1.vars['weights'])
-        self.weight_norm += FLAGS.w2 * tf.nn.l2_loss(l2.vars['weights'])
-
         znorm = z
 
         recon = l3(znorm)

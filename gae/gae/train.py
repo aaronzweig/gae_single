@@ -39,6 +39,7 @@ flags.DEFINE_integer('anneal', 0, '1 for SA')
 flags.DEFINE_float('auto_dropout', 0.1, 'Dropout for specifically autoregressive neurons')
 flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
 
+flags.DEFINE_float('edge_threshold', -2.0, 'threshold to throw away edges in graphite convolution')
 
 flags.DEFINE_integer('verbose', 1, 'verboseness')
 flags.DEFINE_integer('test_count', 10, 'batch of tests')
@@ -116,10 +117,11 @@ for test in range(FLAGS.test_count):
     else:
         model = GCNModelVAE(placeholders, num_features, num_nodes, features_nonzero)
 
+
+
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
     norm = adj.shape[0] * adj.shape[0] / float((adj.shape[0] * adj.shape[0] - adj.sum()) * 2)
 
-    # Optimizer
     with tf.name_scope('optimizer'):
         opt = OptimizerVAE(preds=model.reconstructions,
                            labels=tf.reshape(tf.sparse_tensor_to_dense(placeholders['adj_orig'], validate_indices=False), [-1]),

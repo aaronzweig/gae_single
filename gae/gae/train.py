@@ -39,7 +39,7 @@ flags.DEFINE_integer('anneal', 0, '1 for SA')
 flags.DEFINE_float('auto_dropout', 0.1, 'Dropout for specifically autoregressive neurons')
 flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
 
-flags.DEFINE_float('edge_threshold', -2.0, 'threshold to throw away edges in graphite convolution')
+flags.DEFINE_float('edge_drop_percentage', 0., 'Percentage of edges in graphite convolution to drop')
 
 flags.DEFINE_integer('verbose', 1, 'verboseness')
 flags.DEFINE_integer('test_count', 10, 'batch of tests')
@@ -191,6 +191,11 @@ for test in range(FLAGS.test_count):
         feed_dict.update({placeholders['auto_dropout']: FLAGS.auto_dropout})
         feed_dict.update({placeholders['temp']: temp})
         outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
+
+        ##
+        check = sess.run([tf.contrib.distributions.percentile(model.predrop, 25.), tf.contrib.distributions.percentile(model.predrop, 50.), tf.contrib.distributions.percentile(model.predrop, 75.)], feed_dict=feed_dict)
+        print(check)
+        ##
 
         if FLAGS.anneal:
             temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)

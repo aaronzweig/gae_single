@@ -39,7 +39,7 @@ flags.DEFINE_integer('anneal', 0, '1 for SA')
 flags.DEFINE_float('auto_dropout', 0.1, 'Dropout for specifically autoregressive neurons')
 flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
 
-flags.DEFINE_float('edge_drop_percentage', 0., 'Percentage of edges in graphite convolution to drop')
+flags.DEFINE_float('graphite_dropout', 0., 'Fraction of edges in graphite convolution to drop')
 
 flags.DEFINE_integer('verbose', 1, 'verboseness')
 flags.DEFINE_integer('test_count', 10, 'batch of tests')

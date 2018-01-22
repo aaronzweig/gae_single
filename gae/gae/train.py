@@ -37,7 +37,8 @@ flags.DEFINE_float('autoregressive_scalar', 0., 'Scale down contribution of auto
 flags.DEFINE_integer('vae', 1, '1 for doing VGAE embeddings first')
 flags.DEFINE_integer('anneal', 0, '1 for SA')
 flags.DEFINE_float('auto_dropout', 0.1, 'Dropout for specifically autoregressive neurons')
-flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
+
+flags.DEFINE_integer('batch_normalize', 0, 'normalize the embeddings before decoding')
 
 flags.DEFINE_float('graphite_dropout', 0., 'Fraction of edges in graphite convolution to drop')
 

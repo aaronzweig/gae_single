@@ -140,7 +140,13 @@ class GCNModelFeedback(GCNModelVAE):
                                       act=lambda x: x,
                                       logging=self.logging)
 
-        recon = l3(z)
+        znorm = z
+        ### Batch normalize
+        mean, variance = tf.nn.moments(znorm, axes = [0])
+        znorm = tf.nn.batch_normalization(znorm, mean, variance, None, None, 1e-8)
+        ###
+
+        recon = l3(znorm)
         recon = tf.nn.sigmoid(recon)
 
         ### Edge drop threshold

@@ -81,7 +81,6 @@ features_nonzero = features[1].shape[0]
 
 rocs = np.zeros(FLAGS.test_count)
 aps = np.zeros(FLAGS.test_count)
-liks = np.zeros(FLAGS.test_count)
 
 for test in range(FLAGS.test_count):
     func = get_test_edges
@@ -152,12 +151,12 @@ for test in range(FLAGS.test_count):
         feed_dict.update({placeholders['auto_dropout']: 0.})
         feed_dict.update({placeholders['temp']: temp})
 
-        emb, recon, log_lik = sess.run([model.z_mean, model.reconstructions_noiseless, opt.log_lik], feed_dict=feed_dict)
-        return (emb, np.reshape(recon, (num_nodes, num_nodes)), log_lik)
+        emb, recon = sess.run([model.z_mean, model.reconstructions_noiseless], feed_dict=feed_dict)
+        return (emb, np.reshape(recon, (num_nodes, num_nodes)))
 
     def get_roc_score(edges_pos, edges_neg):
 
-        emb, adj_rec, log_lik = reconstruct()
+        emb, adj_rec = reconstruct()
 
         preds = sigmoid(adj_rec[edges_pos])
         preds_neg = sigmoid(adj_rec[edges_neg])
@@ -174,7 +173,7 @@ for test in range(FLAGS.test_count):
         except ValueError:
             ap_score = -1
 
-        return roc_score, ap_score, emb, log_lik
+        return roc_score, ap_score, emb
 
 
 
@@ -184,7 +183,6 @@ for test in range(FLAGS.test_count):
     val_metrics = np.zeros(FLAGS.epochs)
     test_rocs = np.zeros(FLAGS.epochs)
     test_aps = np.zeros(FLAGS.epochs)
-    test_liks = np.zeros(FLAGS.epochs)
     test_embs = []
 
     # Train model
@@ -210,12 +208,11 @@ for test in range(FLAGS.test_count):
         avg_cost = outs[1]
         avg_accuracy = outs[2]
 
-        roc_curr, ap_curr, _, _ = get_roc_score(val_edges, val_edges_false)
+        roc_curr, ap_curr, _ = get_roc_score(val_edges, val_edges_false)
         val_metrics[epoch] = roc_curr + ap_curr
-        roc_score, ap_score, emb, log_lik = get_roc_score(test_edges, test_edges_false)
+        roc_score, ap_score, emb = get_roc_score(test_edges, test_edges_false)
         test_rocs[epoch] = roc_score
         test_aps[epoch] = ap_score
-        test_liks[epoch] = log_lik
         test_embs.append(emb)
 
         if FLAGS.verbose:
@@ -228,13 +225,11 @@ for test in range(FLAGS.test_count):
     arg = np.argmax(val_metrics)
     rocs[test] = test_rocs[arg]
     aps[test] = test_aps[arg]
-    liks[test] = test_liks[arg]
 
     if FLAGS.verbose or dataset_str == 'pubmed':
         print(arg)
         print(test_rocs[arg])
         print(test_aps[arg])
-        print(test_liks[arg])
         sys.stdout.flush()
         if FLAGS.save:
             np.save("emb", test_embs[arg])
@@ -243,4 +238,3 @@ for test in range(FLAGS.test_count):
 if not FLAGS.verbose:
     print((np.mean(rocs), stats.sem(rocs)))
     print((np.mean(aps), stats.sem(aps)))
-    print((np.mean(liks), stats.sem(liks)))

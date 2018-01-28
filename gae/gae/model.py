@@ -146,7 +146,8 @@ class GCNModelFeedback(GCNModelVAE):
         ### Edge drop threshold
         threshold = tf.stop_gradient(tf.contrib.distributions.percentile(recon, 100 * FLAGS.edge_drop_percentage))
         self.threshold = threshold
-        condition = tf.greater(recon, tf.zeros_like(recon) + threshold)
+        self.predrop = recon
+        condition = tf.greater(recon, threshold)
         recon = tf.where(condition, recon, tf.zeros_like(recon))
         ###
 

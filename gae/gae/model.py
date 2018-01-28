@@ -140,12 +140,13 @@ class GCNModelFeedback(GCNModelVAE):
                                       act=lambda x: x,
                                       logging=self.logging)
 
-        recon = l3(z)
+        znorm = z
+
+        recon = l3(znorm)
         recon = tf.nn.sigmoid(recon)
 
         ### Edge drop threshold
-        threshold = tf.stop_gradient(tf.contrib.distributions.percentile(recon, 100 * FLAGS.edge_drop_percentage))
-        self.threshold = threshold
+        threshold = tf.stop_gradient(tf.contrib.distributions.percentile(recon, FLAGS.edge_drop_percentage))
         self.predrop = recon
         condition = tf.greater(recon, threshold)
         recon = tf.where(condition, recon, tf.zeros_like(recon))

@@ -192,11 +192,6 @@ for test in range(FLAGS.test_count):
         feed_dict.update({placeholders['temp']: temp})
         outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
-        ##
-        check = sess.run([tf.contrib.distributions.percentile(model.predrop, 25.), tf.contrib.distributions.percentile(model.predrop, 50.), tf.contrib.distributions.percentile(model.predrop, 75.), model.threshold], feed_dict=feed_dict)
-        print(check)
-        ##
-
         if FLAGS.anneal:
             temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)
         else:

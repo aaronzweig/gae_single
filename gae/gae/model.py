@@ -144,12 +144,12 @@ class GCNModelFeedback(GCNModelVAE):
         recon = tf.nn.sigmoid(recon)
 
         ### Edge drop threshold
-        if FLAGS.graphite_dropout > 0:
-          threshold = tf.stop_gradient(tf.contrib.distributions.percentile(recon, 100 * FLAGS.graphite_dropout))
-          threshold_matrix = -threshold * tf.eye(self.n_samples) + threshold
+        # if FLAGS.graphite_dropout > 0:
+        #   threshold = tf.stop_gradient(tf.contrib.distributions.percentile(recon, 100 * FLAGS.graphite_dropout))
+        #   threshold_matrix = -threshold * tf.eye(self.n_samples) + threshold
 
-          condition = tf.greater(recon, threshold_matrix)
-          recon = tf.where(condition, recon, tf.zeros_like(recon))
+        #   condition = tf.greater(recon, threshold_matrix)
+        #   recon = tf.where(condition, recon, tf.zeros_like(recon))
         ###
 
 
@@ -161,7 +161,6 @@ class GCNModelFeedback(GCNModelVAE):
         update = l2((update, recon, z))
 
         update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        # update = (1 - self.temp) * z + self.temp * update
 
         reconstructions = l3(update)
 

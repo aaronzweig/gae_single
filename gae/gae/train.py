@@ -193,7 +193,7 @@ for test in range(FLAGS.test_count):
         outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
         ##
-        check = sess.run([tf.contrib.distributions.percentile(model.predrop, 25.), tf.contrib.distributions.percentile(model.predrop, 50.), tf.contrib.distributions.percentile(model.predrop, 75.), model.threshold], feed_dict=feed_dict)
+        check = sess.run([tf.contrib.distributions.percentile(model.predrop, 25.), tf.contrib.distributions.percentile(model.predrop, 50.), tf.contrib.distributions.percentile(model.predrop, 75.)], feed_dict=feed_dict)
         print(check)
         ##
 

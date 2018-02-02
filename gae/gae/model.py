@@ -143,6 +143,14 @@ class GCNModelFeedback(GCNModelVAE):
         recon = l3(z)
         recon = tf.nn.sigmoid(recon)
 
+        ### Edge drop threshold
+        threshold = tf.stop_gradient(tf.contrib.distributions.percentile(recon, 100 * FLAGS.edge_cull))
+        threshold_matrix = -threshold * tf.eye(self.n_samples) + threshold
+
+        condition = tf.greater(recon, threshold_matrix)
+        recon = tf.where(condition, recon, tf.zeros_like(recon))
+        ###
+
 
         d = tf.reduce_sum(recon, 1)
         d = tf.pow(d, -0.5)

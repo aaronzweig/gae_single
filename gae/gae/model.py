@@ -149,7 +149,7 @@ class GCNModelFeedback(GCNModelVAE):
 
         condition = tf.greater(recon, threshold_matrix)
         recon = tf.where(condition, recon, tf.zeros_like(recon))
-        recon = tf.stop_gradient(recon)
+        # recon = tf.stop_gradient(recon)
         ###
 
 

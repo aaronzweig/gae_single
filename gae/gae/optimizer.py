@@ -10,6 +10,7 @@ class OptimizerVAE(object):
 
         sample = tf.matmul(model.sample, tf.transpose(model.sample))
         sample = tf.reshape(sample, [-1])
+        sample = tf.stop_gradient(sample)
 
         self.cost = norm * tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub * sample, targets=labels_sub * sample, pos_weight=pos_weight))
 

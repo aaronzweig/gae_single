@@ -141,11 +141,11 @@ class GCNModelFeedback(GCNModelVAE):
                                       logging=self.logging)
 
         shape = tf.shape(z[:,0])
-        self.sample = tf.where(tf.random_uniform(shape) - FLAGS.node_cull < 0, tf.zeros(shape), tf.ones(shape))
+        self.sample = tf.where(tf.random_uniform(shape) - FLAGS.node_cull * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
         self.sample = tf.expand_dims(self.sample, 1)
 
         recon = l3(z * self.sample)
-        recon = tf.nn.sigmoid(recon)
+        recon = tf.nn.sigmoid(recon) + tf.eye(self.n_samples)
 
         d = tf.reduce_sum(recon, 1)
         d = tf.pow(d, -0.5)

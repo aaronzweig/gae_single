@@ -36,7 +36,7 @@ flags.DEFINE_float('edge_dropout', 0., 'Dropout for individual edges in training
 flags.DEFINE_float('autoregressive_scalar', 0., 'Scale down contribution of autoregressive to final link prediction')
 flags.DEFINE_integer('vae', 1, '1 for doing VGAE embeddings first')
 flags.DEFINE_integer('anneal', 0, '1 for SA')
-flags.DEFINE_float('auto_dropout', 0.1, 'Dropout for specifically autoregressive neurons')
+flags.DEFINE_float('auto_dropout', 1.0, 'Dropout for specifically autoregressive neurons')
 flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
 
 flags.DEFINE_float('node_cull', 0., 'Fraction of nodes in graphite convolution to drop')

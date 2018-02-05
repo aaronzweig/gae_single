@@ -145,7 +145,7 @@ class GCNModelFeedback(GCNModelVAE):
         self.sample = tf.expand_dims(self.sample, 1)
         self.sample = tf.stop_gradient(self.sample)
 
-        recon = l3(z * self.sample)
+        recon = l3(z)
         recon = tf.nn.sigmoid(recon) + tf.eye(self.n_samples)
 
         d = tf.reduce_sum(recon, 1)
@@ -158,7 +158,7 @@ class GCNModelFeedback(GCNModelVAE):
         update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
         # update = (1 - self.temp) * z + self.temp * update
 
-        reconstructions = l3(update * self.sample)
+        reconstructions = l3(update)
 
         reconstructions = tf.reshape(reconstructions, [-1])
         return reconstructions

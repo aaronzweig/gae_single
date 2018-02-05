@@ -141,7 +141,8 @@ class GCNModelFeedback(GCNModelVAE):
                                       logging=self.logging)
 
         shape = tf.shape(z[:,0])
-        self.sample = tf.where(tf.random_uniform(shape) - FLAGS.node_cull / self.n_samples * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
+        ratio = 1.0 * (self.n_samples - FLAGS.node_cull) / self.n_samples
+        self.sample = tf.where(tf.random_uniform(shape) - ratio * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
         self.sample = tf.expand_dims(self.sample, 1)
         self.sample = tf.stop_gradient(self.sample)
         sample = tf.matmul(self.sample, tf.transpose(self.sample))

@@ -144,7 +144,7 @@ class GCNModelFeedback(GCNModelVAE):
         self.sample = tf.where(tf.random_uniform(shape) - FLAGS.node_cull / self.n_samples * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
         self.sample = tf.expand_dims(self.sample, 1)
         self.sample = tf.stop_gradient(self.sample)
-        sample = tf.matmul(model.sample, tf.transpose(model.sample))
+        sample = tf.matmul(self.sample, tf.transpose(self.sample))
 
         recon = l3(z)
         recon = tf.nn.sigmoid(recon) * sample + tf.eye(self.n_samples)

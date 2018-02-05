@@ -162,8 +162,14 @@ for test in range(FLAGS.test_count):
 
         preds_all = np.hstack([preds, preds_neg])
         labels_all = np.hstack([np.ones(len(preds)), np.zeros(len(preds))])
-        roc_score = roc_auc_score(labels_all, preds_all)
-        ap_score = average_precision_score(labels_all, preds_all)
+        try:
+            roc_score = roc_auc_score(labels_all, preds_all)
+        except ValueError:
+            roc_score = -1
+        try:
+            ap_score = average_precision_score(labels_all, preds_all)
+        except ValueError:
+            ap_score = -1
 
         return roc_score, ap_score, emb
 

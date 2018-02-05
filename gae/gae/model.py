@@ -140,18 +140,12 @@ class GCNModelFeedback(GCNModelVAE):
                                       act=lambda x: x,
                                       logging=self.logging)
 
-        recon = l3(z)
+        shape = tf.shape(z[:,0])
+        self.sample = tf.where(tf.random_uniform(shape) - FLAGS.node_cull < 0, tf.zeros(shape), tf.ones(shape))
+        self.sample = tf.expand_dims(self.sample, 1)
+
+        recon = l3(z * self.sample)
         recon = tf.nn.sigmoid(recon)
-
-        ### Edge drop threshold
-        threshold = tf.contrib.distributions.percentile(recon, 100 * FLAGS.edge_cull)
-        threshold_matrix = -threshold * tf.eye(self.n_samples) + threshold
-
-        condition = tf.greater(recon, threshold_matrix)
-        recon = tf.where(condition, recon, tf.zeros_like(recon))
-        # recon = tf.stop_gradient(recon)
-        ###
-
 
         d = tf.reduce_sum(recon, 1)
         d = tf.pow(d, -0.5)
@@ -163,7 +157,7 @@ class GCNModelFeedback(GCNModelVAE):
         update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
         # update = (1 - self.temp) * z + self.temp * update
 
-        reconstructions = l3(update)
+        reconstructions = l3(update * self.sample)
 
         reconstructions = tf.reshape(reconstructions, [-1])
         return reconstructions

@@ -36,6 +36,9 @@ flags.DEFINE_integer('test_count', 10, 'Set num tests')
 flags.DEFINE_integer('emb_size', 128, 'Number of eigenvectors for embedding')
 flags.DEFINE_integer('connected_split', 1, 'use split with training set always connected')
 
+flags.DEFINE_float('p', 1.0, 'p')
+flags.DEFINE_float('q', 1.0, 'q')
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
@@ -67,7 +70,7 @@ aps = np.zeros(FLAGS.test_count)
 
 def deepwalk(adj):
     nx_G = nx.from_scipy_sparse_matrix(adj)
-    G = node2vec.Graph(nx_G, False, 1, 1)
+    G = node2vec.Graph(nx_G, False, FLAGS.p, FLAGS.q)
     G.preprocess_transition_probs()
     walks = G.simulate_walks(10, 80)
     walks = [map(str, walk) for walk in walks]

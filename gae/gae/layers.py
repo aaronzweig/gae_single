@@ -69,7 +69,7 @@ class Scale(Layer):
     """Dense layer."""
     def __init__(self, input_dim, dropout=0., pos=False, sparse_inputs=False,
                  act=tf.nn.relu, bias=False, featureless=False, **kwargs):
-        super(Dense, self).__init__(**kwargs)
+        super(Scale, self).__init__(**kwargs)
 
         self.dropout = dropout
         self.act = act

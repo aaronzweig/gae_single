@@ -16,7 +16,7 @@ class OptimizerVAE(object):
         # self.cost *= 1.0 * num_nodes * num_nodes / tf.reduce_sum(sample)
         self.cost = norm * tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=pos_weight))
 
-        self.lamb = tf.Variable(zeros(1) + 1000., name = 'scalar')
+        lamb = tf.Variable(zeros(1) + 1000., name = 'scalar')
         self.cost += lamb
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer

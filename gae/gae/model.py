@@ -159,7 +159,7 @@ class GCNModelFeedback(GCNModelVAE):
         update = l2((update, recon, z))
 
         #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        lamb = tf.Variable(0.5, name = 'scalar')
+        lamb = tf.Variable(0.2, name = 'scalar')
         update = (1 - lamb) * z + lamb * update
         self.lamb = lamb
 

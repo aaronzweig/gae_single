@@ -65,6 +65,30 @@ class Layer(object):
             outputs = self._call(inputs)
             return outputs
 
+class Scale(Layer):
+    """Dense layer."""
+    def __init__(self, input_dim, dropout=0., pos=False, sparse_inputs=False,
+                 act=tf.nn.relu, bias=False, featureless=False, **kwargs):
+        super(Dense, self).__init__(**kwargs)
+
+        self.dropout = dropout
+        self.act = act
+        self.sparse_inputs = sparse_inputs
+        self.featureless = featureless
+        self.bias = bias
+
+        with tf.variable_scope(self.name + '_vars'):
+            self.vars['scale'] = zeros([input_dim], name='weights')
+
+        if self.logging:
+            self._log_vars()
+
+    def _call(self, inputs):
+        x = inputs[0]
+        y = inputs[1]
+
+        return x * (1 - self.vars['bias']) + y * self.vars['bias']
+
 class Dense(Layer):
     """Dense layer."""
     def __init__(self, input_dim, output_dim, dropout=0., pos=False, sparse_inputs=False,

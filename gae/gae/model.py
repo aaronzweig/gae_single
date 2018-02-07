@@ -158,9 +158,11 @@ class GCNModelFeedback(GCNModelVAE):
         update = l2((update, recon, z))
 
         #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        with tf.variable_scope(self.name + '_vars'):
-            self.vars['lamb'] = zeros(FLAGS.hidden2, name="weights") + 0.1
-        update = (1 - self.vars['lamb']) * z + self.vars['lamb'] * update
+
+        l4 = Scale(input_dim = FLAGS.hidden2, logging = self.logging)
+        update = l4((z, update))
+
+        model.var = l4.vars['weights']
 
         reconstructions = l3(update)
 

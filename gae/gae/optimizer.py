@@ -31,8 +31,6 @@ class OptimizerVAE(object):
         self.opt_op = self.optimizer.minimize(self.cost)
         self.grads_vars = self.optimizer.compute_gradients(self.cost)
 
-        self.var_grad = tf.gradients(self.cost, [model.vars['lamb']])[0]
-
         self.correct_prediction = tf.equal(tf.cast(tf.greater_equal(preds_sub, 0.5), tf.int32),
                                            tf.cast(labels_sub, tf.int32))
         self.accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32))

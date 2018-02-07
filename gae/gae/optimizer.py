@@ -1,5 +1,5 @@
 import tensorflow as tf
-import layers as *
+from layers import *
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS

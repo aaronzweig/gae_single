@@ -168,6 +168,7 @@ class GCNModelFeedback(GCNModelVAE):
 
         # update = self.l4((z, update))
         # self.var = self.l4.vars['scale']
+        self.var = 0
 
         reconstructions = self.l3(update)
         reconstructions = tf.reshape(reconstructions, [-1])

@@ -138,7 +138,7 @@ for test in range(FLAGS.test_count):
         gpu_options = tf.GPUOptions(allow_growth=True)
         sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True))
     sess.run(tf.global_variables_initializer())
-
+    # writer = tf.summary.FileWriter("sess_graph", sess.graph)
     temp = 0.0
 
     def sigmoid(x):
@@ -237,3 +237,5 @@ for test in range(FLAGS.test_count):
 if not FLAGS.verbose:
     print((np.mean(rocs), stats.sem(rocs)))
     print((np.mean(aps), stats.sem(aps)))
+
+# writer.close()

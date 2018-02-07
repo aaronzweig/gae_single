@@ -88,9 +88,10 @@ class GCNModelVAE(Model):
 
         return z
 
+    def make_decoder(self):
+      return
+
     def decoder(self, z):
-        if FLAGS.normalize:
-          z = tf.nn.l2_normalize(z, dim = 1)     
 
         reconstructions = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                       act=lambda x: x,
@@ -103,6 +104,7 @@ class GCNModelVAE(Model):
     def _build(self):
   
         self.encoder(self.inputs)
+        self.make_decoder()
         z = self.get_z(random = True)
         z_noiseless = self.get_z(random = False)
         if not FLAGS.vae:
@@ -115,29 +117,34 @@ class GCNModelFeedback(GCNModelVAE):
     def __init__(self, placeholders, num_features, num_nodes, features_nonzero, **kwargs):
         super(GCNModelFeedback, self).__init__(placeholders, num_features, num_nodes, features_nonzero, **kwargs)
 
-    def decoder(self, z):
-
-        l0 = GraphiteSparse(input_dim=self.input_dim,
+    def make_decoder(self):
+        self.l0 = GraphiteSparse(input_dim=self.input_dim,
                                       output_dim=FLAGS.hidden3,
                                       act=tf.nn.relu,
                                       dropout=0.,
                                       logging=self.logging)
 
-        l1 = Graphite(input_dim=FLAGS.hidden2,
+        self.l1 = Graphite(input_dim=FLAGS.hidden2,
                                               output_dim=FLAGS.hidden3,
                                               act=tf.nn.relu,
                                               dropout=0.,
                                               logging=self.logging)
 
-        l2 = Graphite(input_dim=FLAGS.hidden3,
+        self.l2 = Graphite(input_dim=FLAGS.hidden3,
                                               output_dim=FLAGS.hidden2,
                                               act=lambda x: x,
                                               dropout=self.dropout,
                                               logging=self.logging)
 
-        l3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+        self.l3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                       act=lambda x: x,
                                       logging=self.logging)
+
+        self.l4 = Scale(input_dim = FLAGS.hidden2, logging = self.logging)
+
+    def decoder(self, z):
+
+
 
         # shape = tf.shape(z[:,0])
         # ratio = 1.0 * (self.n_samples - FLAGS.node_cull) / self.n_samples
@@ -146,7 +153,7 @@ class GCNModelFeedback(GCNModelVAE):
         # self.sample = tf.stop_gradient(self.sample)
         # sample = tf.matmul(self.sample, tf.transpose(self.sample))
 
-        recon = l3(z)
+        recon = self.l3(z)
         #recon = tf.nn.sigmoid(recon) * sample + tf.eye(self.n_samples)
         recon = tf.nn.relu(recon)
 
@@ -154,18 +161,15 @@ class GCNModelFeedback(GCNModelVAE):
         d = tf.pow(d, -0.5)
         recon = tf.expand_dims(d, 0) * recon * tf.expand_dims(d, 1)
 
-        update = l1((z, recon, z)) + l0((self.inputs, recon, z))
-        update = l2((update, recon, z))
+        update = self.l1((z, recon, z)) + self.l0((self.inputs, recon, z))
+        update = self.l2((update, recon, z))
 
-        #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
+        update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
 
-        l4 = Scale(input_dim = FLAGS.hidden2, logging = self.logging)
-        update = l4((z, update))
+        # update = self.l4((z, update))
+        # self.var = self.l4.vars['scale']
 
-        self.var = l4.vars['scale']
-
-        reconstructions = l3(update)
-
+        reconstructions = self.l3(update)
         reconstructions = tf.reshape(reconstructions, [-1])
         return reconstructions
 

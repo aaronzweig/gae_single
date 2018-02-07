@@ -148,7 +148,7 @@ class GCNModelFeedback(GCNModelVAE):
         sample = tf.matmul(self.sample, tf.transpose(self.sample))
 
         recon = l3(z)
-        recon = tf.nn.sigmoid(recon) * sample + tf.eye(self.n_samples)
+        recon = tf.nn.sigmoid(recon) # * sample + tf.eye(self.n_samples)
 
         d = tf.reduce_sum(recon, 1)
         d = tf.pow(d, -0.5)

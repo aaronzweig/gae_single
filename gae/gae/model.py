@@ -164,7 +164,7 @@ class GCNModelFeedback(GCNModelVAE):
         update = self.l1((z, recon, z)) + self.l0((self.inputs, recon, z))
         update = self.l2((update, recon, z))
 
-        update = tf.nn.l2_normalize(update, axis = 1)
+        update = tf.nn.l2_normalize(update, dim = 1)
 
         update = z + FLAGS.autoregressive_scalar * update
 

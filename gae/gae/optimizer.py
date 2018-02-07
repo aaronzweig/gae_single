@@ -19,6 +19,7 @@ class OptimizerVAE(object):
 
         lamb = tf.Variable(1000., name = 'scalar')
         self.cost += lamb
+        self.lamb = lamb
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer
 

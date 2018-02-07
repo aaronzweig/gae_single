@@ -87,7 +87,7 @@ class Scale(Layer):
         x = inputs[0]
         y = inputs[1]
 
-        return x * (1 - self.vars['bias']) + y * self.vars['bias']
+        return x * (1 - self.vars['scale']) + y * self.vars['scale']
 
 class Dense(Layer):
     """Dense layer."""

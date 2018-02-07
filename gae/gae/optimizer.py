@@ -8,9 +8,9 @@ class OptimizerVAE(object):
         preds_sub = preds
         labels_sub = labels
 
-        sample = tf.matmul(model.sample, tf.transpose(model.sample))
-        sample = tf.reshape(sample, [-1])
-        sample = tf.stop_gradient(sample)
+        # sample = tf.matmul(model.sample, tf.transpose(model.sample))
+        # sample = tf.reshape(sample, [-1])
+        # sample = tf.stop_gradient(sample)
 
         # self.cost = norm * tf.reduce_mean(sample * tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=pos_weight))
         # self.cost *= 1.0 * num_nodes * num_nodes / tf.reduce_sum(sample)
@@ -19,7 +19,6 @@ class OptimizerVAE(object):
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer
 
-        # Latent loss
         self.log_lik = self.cost
 
         if FLAGS.vae:

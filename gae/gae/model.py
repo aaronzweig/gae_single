@@ -140,15 +140,16 @@ class GCNModelFeedback(GCNModelVAE):
                                       act=lambda x: x,
                                       logging=self.logging)
 
-        shape = tf.shape(z[:,0])
-        ratio = 1.0 * (self.n_samples - FLAGS.node_cull) / self.n_samples
-        self.sample = tf.where(tf.random_uniform(shape) - ratio * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
-        self.sample = tf.expand_dims(self.sample, 1)
-        self.sample = tf.stop_gradient(self.sample)
-        sample = tf.matmul(self.sample, tf.transpose(self.sample))
+        # shape = tf.shape(z[:,0])
+        # ratio = 1.0 * (self.n_samples - FLAGS.node_cull) / self.n_samples
+        # self.sample = tf.where(tf.random_uniform(shape) - ratio * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
+        # self.sample = tf.expand_dims(self.sample, 1)
+        # self.sample = tf.stop_gradient(self.sample)
+        # sample = tf.matmul(self.sample, tf.transpose(self.sample))
 
         recon = l3(z)
-        recon = tf.nn.sigmoid(recon) # * sample + tf.eye(self.n_samples)
+        #recon = tf.nn.sigmoid(recon) * sample + tf.eye(self.n_samples)
+        recon = tf.nn.relu(recon)
 
         d = tf.reduce_sum(recon, 1)
         d = tf.pow(d, -0.5)
@@ -157,8 +158,9 @@ class GCNModelFeedback(GCNModelVAE):
         update = l1((z, recon, z)) + l0((self.inputs, recon, z))
         update = l2((update, recon, z))
 
-        update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        # update = (1 - self.temp) * z + self.temp * update
+        #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
+        lamb = tf.Variable(0, name = 'scalar')
+        update = (1 - tf.nn.sigmoid(lamb)) * z + tf.nn.sigmoid(lamb) * update
 
         reconstructions = l3(update)
 

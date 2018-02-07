@@ -107,7 +107,6 @@ class Graphite(Layer):
             self.vars['weights'] = weight_variable_glorot(input_dim, output_dim, name="weights")
         self.dropout = dropout
         self.act = act
-        self.sparse_inputs = sparse_inputs
 
     def _call(self, inputs):
         x = inputs[0]
@@ -125,7 +124,6 @@ class GraphiteSparse(Layer):
             self.vars['weights'] = weight_variable_glorot(input_dim, output_dim, name="weights")
         self.dropout = dropout
         self.act = act
-        self.sparse_inputs = sparse_inputs
 
     def _call(self, inputs):
         x = inputs[0]

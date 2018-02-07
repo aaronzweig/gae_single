@@ -78,7 +78,7 @@ class Scale(Layer):
         self.bias = bias
 
         with tf.variable_scope(self.name + '_vars'):
-            self.vars['scale'] = zeros([1], name='weights')
+            self.vars['scale'] = zeros([input_dim], name='weights')
 
         if self.logging:
             self._log_vars()

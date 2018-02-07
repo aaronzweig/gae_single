@@ -164,7 +164,7 @@ class GCNModelFeedback(GCNModelVAE):
         update = self.l1((z, recon, z)) + self.l0((self.inputs, recon, z))
         update = self.l2((update, recon, z))
 
-        update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
+        #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
 
         update = self.l4((z, update))
         self.var = self.l4.vars['scale']

@@ -159,13 +159,12 @@ class GCNModelFeedback(GCNModelVAE):
         update = l2((update, recon, z))
 
         #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        lamb = tf.Variable(-5.0, name = 'scalar')
-        update = (1 - lamb) * z + lamb * update
-        self.lamb = lamb
+        self.lamb = tf.Variable(-5.0, name = 'scalar')
+        update = (1 - self.lamb) * z + self.lamb * update
 
         reconstructions = l3(update)
 
-        reconstructions = tf.reshape(reconstructions, [-1])
+        reconstructions = tf.reshape(reconstructions, [-1]) + self.lamb
         return reconstructions
 
 class GCNModelRelnet(GCNModelVAE):

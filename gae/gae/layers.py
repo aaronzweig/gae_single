@@ -87,7 +87,7 @@ class Scale(Layer):
         x = inputs[0]
         y = inputs[1]
 
-        return x * (1 - self.vars['scale']) + y * self.vars['scale']
+        return x * (1 - tf.nn.sigmoid(self.vars['scale'])) + y * tf.nn.sigmoid(self.vars['scale'])
 
 class Dense(Layer):
     """Dense layer."""

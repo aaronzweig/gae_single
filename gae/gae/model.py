@@ -162,7 +162,7 @@ class GCNModelFeedback(GCNModelVAE):
         l4 = Scale(input_dim = FLAGS.hidden2, logging = self.logging)
         update = l4((z, update))
 
-        model.var = l4.vars['scale']
+        self.var = l4.vars['scale']
 
         reconstructions = l3(update)
 

@@ -161,6 +161,7 @@ class GCNModelFeedback(GCNModelVAE):
         #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
         lamb = tf.Variable(-100., name = 'scalar')
         update = (1 - tf.nn.sigmoid(lamb)) * z + tf.nn.sigmoid(lamb) * update
+        self.lamb = lamb
 
         reconstructions = l3(update)
 

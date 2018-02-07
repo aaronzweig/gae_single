@@ -206,7 +206,6 @@ for test in range(FLAGS.test_count):
         avg_cost = outs[1]
         avg_accuracy = outs[2]
         print(outs[3])
-        print(outs[4])
 
         roc_curr, ap_curr, _ = get_roc_score(val_edges, val_edges_false)
         val_metrics[epoch] = roc_curr + ap_curr

@@ -117,20 +117,19 @@ class GCNModelFeedback(GCNModelVAE):
 
     def decoder(self, z):
 
-        l0 = GraphConvolutionDense(input_dim=self.input_dim,
+        l0 = GraphiteSparse(input_dim=self.input_dim,
                                       output_dim=FLAGS.hidden3,
-                                      sparse_inputs = True,
                                       act=tf.nn.relu,
                                       dropout=0.,
                                       logging=self.logging)
 
-        l1 = GraphConvolutionDense(input_dim=FLAGS.hidden2,
+        l1 = Graphite(input_dim=FLAGS.hidden2,
                                               output_dim=FLAGS.hidden3,
                                               act=tf.nn.relu,
                                               dropout=0.,
                                               logging=self.logging)
 
-        l2 = GraphConvolutionDense(input_dim=FLAGS.hidden3,
+        l2 = Graphite(input_dim=FLAGS.hidden3,
                                               output_dim=FLAGS.hidden2,
                                               act=lambda x: x,
                                               dropout=self.dropout,

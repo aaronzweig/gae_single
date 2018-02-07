@@ -99,13 +99,12 @@ class Dense(Layer):
 
         return self.act(output)
 
-class GraphConvolutionDense(Layer):
+class Graphite(Layer):
     """Basic graph convolution layer for undirected graph without edge labels."""
-    def __init__(self, input_dim, output_dim, sparse_inputs = False, dropout=0., act=tf.nn.relu, **kwargs):
-        super(GraphConvolutionDense, self).__init__(**kwargs)
+    def __init__(self, input_dim, output_dim, dropout=0., act=tf.nn.relu, **kwargs):
+        super(Graphite, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):
             self.vars['weights'] = weight_variable_glorot(input_dim, output_dim, name="weights")
-            #self.vars['skip'] = weight_variable_glorot(FLAGS.hidden2, output_dim, name="skip")
         self.dropout = dropout
         self.act = act
         self.sparse_inputs = sparse_inputs
@@ -113,13 +112,26 @@ class GraphConvolutionDense(Layer):
     def _call(self, inputs):
         x = inputs[0]
         adj = inputs[1]
-        #z = inputs[2]
-        if self.sparse_inputs:
-            x = tf.sparse_tensor_dense_matmul(x, self.vars['weights'])
-        else:
-            x = tf.matmul(x, self.vars['weights'])
+        x = tf.matmul(x, self.vars['weights'])
         x = tf.matmul(adj, x)
-        #x += tf.matmul(z, self.vars['skip'])
+        outputs = self.act(x)
+        return outputs
+
+class GraphiteSparse(Layer):
+    """Basic graph convolution layer for undirected graph without edge labels."""
+    def __init__(self, input_dim, output_dim, dropout=0., act=tf.nn.relu, **kwargs):
+        super(GraphiteSparse, self).__init__(**kwargs)
+        with tf.variable_scope(self.name + '_vars'):
+            self.vars['weights'] = weight_variable_glorot(input_dim, output_dim, name="weights")
+        self.dropout = dropout
+        self.act = act
+        self.sparse_inputs = sparse_inputs
+
+    def _call(self, inputs):
+        x = inputs[0]
+        adj = inputs[1]
+        x = tf.sparse_tensor_dense_matmul(x, self.vars['weights'])
+        x = tf.matmul(adj, x)
         outputs = self.act(x)
         return outputs
 

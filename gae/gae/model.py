@@ -159,7 +159,7 @@ class GCNModelFeedback(GCNModelVAE):
         update = l2((update, recon, z))
 
         #update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
-        self.lamb = zeros(1) + 0.5
+        self.lamb = zeros(1)
         update = (1 - self.lamb) * z + self.lamb * update
 
         reconstructions = l3(update)

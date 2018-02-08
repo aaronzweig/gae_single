@@ -165,8 +165,9 @@ class GCNModelFeedback(GCNModelVAE):
         update = self.l2((update, recon, z))
 
         update = tf.nn.l2_normalize(update, dim = 1)
-
         update = z + FLAGS.autoregressive_scalar * update
+
+        # update = (1 - FLAGS.autoregressive_scalar) * z + FLAGS.autoregressive_scalar * update
 
         # update = self.l4((z, update))
         # self.var = self.l4.vars['scale']

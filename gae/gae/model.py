@@ -155,11 +155,15 @@ class GCNModelFeedback(GCNModelVAE):
 
         recon = self.l3(z)
         #recon = tf.nn.sigmoid(recon) * sample + tf.eye(self.n_samples)
-        #recon = tf.nn.sigmoid(recon)
+        recon = tf.nn.sigmoid(recon)
 
         d = tf.reduce_sum(recon, 1)
         d = tf.pow(d, -0.5)
         recon = tf.expand_dims(d, 0) * recon * tf.expand_dims(d, 1)
+
+        ##
+        recon = self.l3(tf.nn.l2_normalize(z, dim = 1))
+        ##
 
         update = self.l1((z, recon, z)) + self.l0((self.inputs, recon, z))
         update = self.l2((update, recon, z))

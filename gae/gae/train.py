@@ -81,6 +81,15 @@ features_nonzero = features[1].shape[0]
 rocs = np.zeros(FLAGS.test_count)
 aps = np.zeros(FLAGS.test_count)
 
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+if FLAGS.gpu == -1:
+    os.environ['CUDA_VISIBLE_DEVICES'] = ''
+    sess = tf.Session()
+else:
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(FLAGS.gpu) # Or whichever device you would like to use
+    gpu_options = tf.GPUOptions(allow_growth=True)
+    sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True))
+
 for test in range(FLAGS.test_count):
     func = get_test_edges
     if FLAGS.connected_split == 0:
@@ -129,14 +138,7 @@ for test in range(FLAGS.test_count):
                            pos_weight=pos_weight,
                            norm=norm)
 
-    os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
-    if FLAGS.gpu == -1:
-        os.environ['CUDA_VISIBLE_DEVICES'] = ''
-        sess = tf.Session()
-    else:
-        os.environ['CUDA_VISIBLE_DEVICES'] = str(FLAGS.gpu) # Or whichever device you would like to use
-        gpu_options = tf.GPUOptions(allow_growth=True)
-        sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True))
+
     sess.run(tf.global_variables_initializer())
     # writer = tf.summary.FileWriter("sess_graph", sess.graph)
     temp = 0.0

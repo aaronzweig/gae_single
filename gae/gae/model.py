@@ -180,6 +180,57 @@ class GCNModelFeedback(GCNModelVAE):
         reconstructions = tf.reshape(reconstructions, [-1])
         return reconstructions
 
+    def sample(self):
+        z = tf.random_normal([self.n_samples, FLAGS.hidden2])
+        reconstruction = tf.nn.sigmoid(self.decoder(z))
+        reconstruction = tf.reshape(reconstruction, [self.n_samples, self.n_samples])
+        return reconstruction
+
+class GCNModelSiemens(GCNModelVAE):
+    def __init__(self, placeholders, num_features, num_nodes, features_nonzero, **kwargs):
+        super(GCNModelSiemens, self).__init__(placeholders, num_features, num_nodes, features_nonzero, **kwargs)
+
+    def make_decoder(self):
+
+        self.l0 = Dense(input_dim=self.input_dim,
+                              output_dim=FLAGS.hidden3,
+                              act=tf.nn.relu,
+                              dropout=0.,
+                              logging=self.logging)
+
+        self.l1 = Dense(input_dim=FLAGS.hidden2,
+                                              output_dim=FLAGS.hidden3,
+                                              act=tf.nn.relu,
+                                              dropout=0.,
+                                              logging=self.logging)
+
+        self.l2 = Dense(input_dim=FLAGS.hidden3,
+                                              output_dim=FLAGS.hidden2,
+                                              act=lambda x: x,
+                                              dropout=self.dropout,
+                                              logging=self.logging)
+
+        self.l3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+                                      act=lambda x: x,
+                                      logging=self.logging)
+
+        self.l4 = Scale(input_dim = FLAGS.hidden2, logging = self.logging)
+
+    def decoder(self, z):
+
+        update = self.l1(z) + self.l0(tf.sparse_tensor_to_dense(self.inputs))
+        update = self.l2(update)
+
+        reconstructions = self.l3(update)
+        reconstructions = tf.reshape(reconstructions, [-1])
+        return reconstructions
+
+    def sample(self):
+        z = tf.random_normal([self.n_samples, FLAGS.hidden2])
+        reconstruction = tf.nn.sigmoid(self.decoder(z))
+        reconstruction = tf.reshape(reconstruction, [self.n_samples, self.n_samples])
+        return reconstruction
+
 class GCNModelRelnet(GCNModelVAE):
     def __init__(self, placeholders, num_features, num_nodes, features_nonzero, **kwargs):
         super(GCNModelRelnet, self).__init__(placeholders, num_features, num_nodes, features_nonzero, **kwargs)

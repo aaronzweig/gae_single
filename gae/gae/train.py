@@ -39,6 +39,8 @@ flags.DEFINE_integer('anneal', 0, '1 for SA')
 flags.DEFINE_float('auto_dropout', 1.0, 'Dropout for specifically autoregressive neurons')
 flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
 
+flags.DEFINE_integer('subsample', 0, 'subsample in optimizer')
+
 flags.DEFINE_integer('node_cull', 0, 'Number of nodes in graphite convolution to drop')
 
 flags.DEFINE_integer('verbose', 1, 'verboseness')
@@ -126,6 +128,8 @@ for test in range(FLAGS.test_count):
     else:
         model = GCNModelVAE(placeholders, num_features, num_nodes, features_nonzero)
 
+    adj_label_k = adj_train + sp.eye(adj_train.shape[0])
+    adj_label = sparse_to_tuple(adj_label_k)
 
 
     pos_weight = float(adj.shape[0] * adj.shape[0] - adj.sum()) / adj.sum()
@@ -176,9 +180,6 @@ for test in range(FLAGS.test_count):
         return roc_score, ap_score, emb
 
 
-
-    adj_label = adj_train + sp.eye(adj_train.shape[0])
-    adj_label = sparse_to_tuple(adj_label)
 
     val_metrics = np.zeros(FLAGS.epochs)
     test_rocs = np.zeros(FLAGS.epochs)

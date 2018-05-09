@@ -137,7 +137,7 @@ class Graphite(Layer):
         recon_1 = inputs[1]
         recon_2 = inputs[2]
         x = tf.matmul(x, self.vars['weights'])
-        x = tf.matmul(tf.transpose(recon_1), tf.matmul(recon_1, x)) + tf.matmul(tf.transpose(recon_2), tf.matmul(recon_2, x))
+        x = tf.matmul(recon_1, tf.matmul(tf.transpose(recon_1), x)) + tf.matmul(recon_2, tf.matmul(tf.transpose(recon_2), x))
         outputs = self.act(x)
         return outputs
 

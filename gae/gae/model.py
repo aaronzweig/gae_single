@@ -156,9 +156,9 @@ class GCNModelFeedback(GCNModelVAE):
 
         recon_1 = tf.nn.l2_normalize(z, dim = 1)
         recon_2 = tf.ones_like(recon_1)
-        recon_2 /= tf.sqrt(tf.reduce_sum(recon_2, dim = 0))
+        recon_2 /= tf.sqrt(tf.reduce_sum(recon_2, axis = 0))
 
-        d = tf.matmul(recon_1, tf.reduce_sum(recon_1, dim = 0)) + tf.matmul(recon_2, tf.reduce_sum(recon_2, dim = 0))
+        d = tf.matmul(recon_1, tf.reduce_sum(recon_1, axis = 0)) + tf.matmul(recon_2, tf.reduce_sum(recon_2, axis = 0))
         d = tf.pow(d, -0.5)
         recon_1 *= d
         recon_2 *= d

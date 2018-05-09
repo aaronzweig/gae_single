@@ -199,8 +199,7 @@ for test in range(FLAGS.test_count):
         feed_dict.update({placeholders['dropout']: FLAGS.dropout})
         feed_dict.update({placeholders['auto_dropout']: FLAGS.auto_dropout})
         feed_dict.update({placeholders['temp']: temp})
-        outs = sess.run([opt.opt_op, opt.cost, opt.accuracy, model.yikes], feed_dict=feed_dict)
-        print(outs[3])
+        outs = sess.run([opt.opt_op, opt.cost, opt.accuracy], feed_dict=feed_dict)
 
         if FLAGS.anneal:
             temp = min(FLAGS.autoregressive_scalar, 3.0 * epoch / FLAGS.epochs)

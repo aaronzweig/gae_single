@@ -150,20 +150,20 @@ class GCNModelFeedback(GCNModelVAE):
         recon = self.l3(tf.nn.l2_normalize(z, dim = 1))
         recon += tf.ones_like(recon)
 
-        # d = tf.reduce_sum(recon, 1)
-        # d = tf.pow(d, -0.5)
-        # recon = tf.expand_dims(d, 0) * recon * tf.expand_dims(d, 1)
+        d = tf.reduce_sum(recon, 1)
+        d = tf.pow(d, -0.5)
+        recon = tf.expand_dims(d, 0) * recon * tf.expand_dims(d, 1)
 
         recon_1 = tf.nn.l2_normalize(z, dim = 1)
         recon_2 = tf.ones_like(recon_1)
         recon_2 /= tf.sqrt(tf.reduce_sum(recon_2, axis = 1, keepdims = True))
 
-        self.yikes = tf.reduce_mean(tf.ones_like(recon) - self.l3(recon_2))
-
         d = tf.matmul(recon_1, tf.expand_dims(tf.reduce_sum(recon_1, axis = 0), 1)) + tf.matmul(recon_2, tf.expand_dims(tf.reduce_sum(recon_2, axis = 0), 1))
         d = tf.pow(d, -0.5)
-        #recon_1 *= d
-        #recon_2 *= d
+        recon_1 *= d
+        recon_2 *= d
+
+        self.yikes = tf.reduce_mean(recon - self.l3(recon_1) - self.l3(recon_2))
 
         update = self.l1((z, recon_1, recon_2)) + self.l0((self.inputs, recon_1, recon_2))
         update = self.l2((update, recon_1, recon_2))

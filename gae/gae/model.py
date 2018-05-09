@@ -144,32 +144,27 @@ class GCNModelFeedback(GCNModelVAE):
 
     def decoder(self, z):
 
+        # recon = self.l3(z)
+        # recon = tf.nn.sigmoid(recon)
 
+        # recon = self.l3(tf.nn.l2_normalize(z, dim = 1))
+        # recon += tf.ones_like(recon)
 
-        # shape = tf.shape(z[:,0])
-        # ratio = 1.0 * (self.n_samples - FLAGS.node_cull) / self.n_samples
-        # self.sample = tf.where(tf.random_uniform(shape) - ratio * self.auto_dropout < 0, tf.zeros(shape), tf.ones(shape))
-        # self.sample = tf.expand_dims(self.sample, 1)
-        # self.sample = tf.stop_gradient(self.sample)
-        # sample = tf.matmul(self.sample, tf.transpose(self.sample))
+        # d = tf.reduce_sum(recon, 1)
+        # d = tf.pow(d, -0.5)
+        # recon = tf.expand_dims(d, 0) * recon * tf.expand_dims(d, 1)
 
-        recon = self.l3(z)
-        #recon = tf.nn.sigmoid(recon) * sample + tf.eye(self.n_samples)
-        recon = tf.nn.sigmoid(recon)
+        recon_1 = tf.nn.l2_normalize(z, dim = 1)
+        recon_2 = tf.ones_like(recon)
+        recon_2 /= tf.sqrt(tf.reduce_sum(recon_2))
 
-        recon = self.l3(tf.nn.l2_normalize(z, dim = 1))
-        recon += tf.ones_like(recon)
-
-        d = tf.reduce_sum(recon, 1)
+        d = recon_1 * tf.reduce_sum(recon_1) + recon_2 * tf.reduce_sum(recon_2)
         d = tf.pow(d, -0.5)
-        recon = tf.expand_dims(d, 0) * recon * tf.expand_dims(d, 1)
+        recon_1 *= d
+        recon_2 *= d
 
-        ##
-        #recon = self.l3(tf.nn.l2_normalize(z, dim = 1))
-        ##
-
-        update = self.l1((z, recon, z)) + self.l0((self.inputs, recon, z))
-        update = self.l2((update, recon, z))
+        update = self.l1((z, recon_1, recon_2)) + self.l0((self.inputs, recon_1, recon_2))
+        update = self.l2((update, recon_1, recon_2))
 
         # update = tf.nn.l2_normalize(update, dim = 1)
         # update = z + FLAGS.autoregressive_scalar * update
@@ -204,6 +199,12 @@ class GCNModelSiemens(GCNModelVAE):
                                               dropout=0.,
                                               logging=self.logging)
 
+        self.l1p5 = Dense(input_dim=FLAGS.hidden3,
+                                              output_dim=FLAGS.hidden3,
+                                              act=tf.nn.relu,
+                                              dropout=self.dropout,
+                                              logging=self.logging)
+
         self.l2 = Dense(input_dim=FLAGS.hidden3,
                                               output_dim=FLAGS.hidden2,
                                               act=lambda x: x,
@@ -219,6 +220,7 @@ class GCNModelSiemens(GCNModelVAE):
     def decoder(self, z):
 
         update = self.l1(z) + self.l0(tf.sparse_tensor_to_dense(self.inputs))
+        update = self.l1p5(update)
         update = self.l2(update)
 
         reconstructions = self.l3(update)

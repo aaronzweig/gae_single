@@ -134,9 +134,10 @@ class Graphite(Layer):
 
     def _call(self, inputs):
         x = inputs[0]
-        adj = inputs[1]
+        recon_1 = inputs[1]
+        recon_2 = inputs[2]
         x = tf.matmul(x, self.vars['weights'])
-        x = tf.matmul(adj, x)
+        x = tf.matmul(tf.transpose(recon_1), tf.matmul(recon_1, x)) + tf.matmul(tf.transpose(recon_2), tf.matmul(recon_2, x))
         outputs = self.act(x)
         return outputs
 
@@ -151,9 +152,10 @@ class GraphiteSparse(Layer):
 
     def _call(self, inputs):
         x = inputs[0]
-        adj = inputs[1]
+        recon_1 = inputs[1]
+        recon_2 = inputs[2]
         x = tf.sparse_tensor_dense_matmul(x, self.vars['weights'])
-        x = tf.matmul(adj, x)
+        x = tf.matmul(tf.transpose(recon_1), tf.matmul(recon_1, x)) + tf.matmul(tf.transpose(recon_2), tf.matmul(recon_2, x))
         outputs = self.act(x)
         return outputs
 

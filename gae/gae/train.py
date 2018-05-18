@@ -40,6 +40,7 @@ flags.DEFINE_float('auto_dropout', 1.0, 'Dropout for specifically autoregressive
 flags.DEFINE_integer('normalize', 0, 'normalize embeddings?')
 
 flags.DEFINE_integer('subsample', 0, 'subsample in optimizer')
+flags.DEFINE_integer('subsample_frac', 1, 'sub')
 
 flags.DEFINE_integer('node_cull', 0, 'Number of nodes in graphite convolution to drop')
 

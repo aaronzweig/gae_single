@@ -50,7 +50,11 @@ class OptimizerSiemens(object):
 
         # self.cost = norm * tf.reduce_mean(sample * tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=pos_weight))
         # self.cost *= 1.0 * num_nodes * num_nodes / tf.reduce_sum(sample)
-        self.cost = tf.reduce_mean(tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=1))
+        neg_cost = tf.reduce_sum(tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=0))
+        pos_cost = tf.reduce_sum(tf.nn.weighted_cross_entropy_with_logits(logits=preds_sub, targets=labels_sub, pos_weight=1)) - neg_cost
+        total = tf.reduce_sum(labels)
+
+        self.cost = pos_cost / total + neg_cost / (num_nodes * num_nodes - total)
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=FLAGS.learning_rate)  # Adam Optimizer
 

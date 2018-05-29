@@ -189,42 +189,62 @@ class GCNModelSiemens(GCNModelVAE):
 
         self.l0 = Dense(input_dim=self.input_dim,
                               output_dim=FLAGS.hidden3,
-                              act=tf.nn.relu,
+                              act=tf.nn.elu,
                               dropout=0.,
                               logging=self.logging)
 
         self.l1 = Dense(input_dim=FLAGS.hidden2,
                                               output_dim=FLAGS.hidden3,
-                                              act=tf.nn.relu,
+                                              act=tf.nn.elu,
                                               dropout=0.,
-                                              logging=self.logging)
-
-        self.l1p5 = Dense(input_dim=FLAGS.hidden3,
-                                              output_dim=FLAGS.hidden3,
-                                              act=tf.nn.relu,
-                                              dropout=self.dropout,
                                               logging=self.logging)
 
         self.l2 = Dense(input_dim=FLAGS.hidden3,
                                               output_dim=FLAGS.hidden2,
                                               act=lambda x: x,
-                                              dropout=self.dropout,
+                                              dropout=0.,
                                               logging=self.logging)
 
-        self.l3 = InnerProductDecoder(input_dim=FLAGS.hidden2,
+        self.l3 = Dense(input_dim=2 * FLAGS.hidden2,
+                                              output_dim=FLAGS.hidden3,
+                                              act=tf.nn.elu,
+                                              dropout=0.,
+                                              logging=self.logging)
+
+        self.l3p5 = Dense(input_dim=FLAGS.hidden3,
+                                              output_dim=FLAGS.hidden3,
+                                              act=tf.nn.elu,
+                                              dropout=0.,
+                                              bias=True,
+                                              logging=self.logging)
+
+        self.l4 = Dense(input_dim=FLAGS.hidden3,
+                                              output_dim=1,
+                                              act=lambda x: x,
+                                              dropout=0.,
+                                              bias=True,
+                                              logging=self.logging)
+
+        self.l5 = InnerProductDecoder(input_dim=FLAGS.hidden2,
                                       act=lambda x: x,
                                       logging=self.logging)
-
-        self.l4 = Scale(input_dim = FLAGS.hidden2, logging = self.logging)
 
     def decoder(self, z):
 
         update = self.l1(z) + self.l0(tf.sparse_tensor_to_dense(self.inputs))
-        update = self.l1p5(update)
         update = self.l2(update)
 
-        reconstructions = self.l3(update)
-        reconstructions = tf.reshape(reconstructions, [-1])
+        A = tf.abs(tf.expand_dims(update, 1) - tf.expand_dims(update, 0))
+        B = tf.expand_dims(update, 1) + tf.expand_dims(update, 0)
+        update = tf.concat((A,B), axis = 2)
+        update = tf.reshape(update, [-1, 2 * FLAGS.hidden2])
+
+        update = self.l3(update)
+        update = self.l3p5(update)
+        update = self.l4(update)
+
+        reconstructions = tf.squeeze(update)
+        self.full_recon = tf.nn.sigmoid(reconstructions)
         return reconstructions
 
     def sample(self):
@@ -233,27 +253,3 @@ class GCNModelSiemens(GCNModelVAE):
         reconstruction = tf.reshape(reconstruction, [self.n_samples, self.n_samples])
         return reconstruction
 
-class GCNModelRelnet(GCNModelVAE):
-    def __init__(self, placeholders, num_features, num_nodes, features_nonzero, **kwargs):
-        super(GCNModelRelnet, self).__init__(placeholders, num_features, num_nodes, features_nonzero, **kwargs)
-
-    def decoder(self, z):
-
-        hidden1 = Dense(input_dim=FLAGS.hidden2,
-                                              output_dim=FLAGS.hidden3,
-                                              act=tf.nn.relu,
-                                              dropout=self.dropout,
-                                              logging=self.logging)(z) 
-
-        hidden2 = Dense(input_dim=FLAGS.hidden3,
-                                              output_dim=FLAGS.hidden4,
-                                              act=lambda x: x,
-                                              dropout=self.dropout,
-                                              logging=self.logging)(hidden1) 
-
-        reconstructions = InnerProductDecoder(input_dim=FLAGS.hidden4,
-                                      act=lambda x: x,
-                                      logging=self.logging)(hidden2)
-
-        reconstructions = tf.reshape(reconstructions, [-1])
-        return reconstructions

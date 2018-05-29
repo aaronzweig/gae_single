@@ -124,7 +124,7 @@ class Dense(Layer):
         return self.act(output)
 
 class Graphite(Layer):
-    """Basic graph convolution layer for undirected graph without edge labels."""
+    """Graphite layer for undirected graph without edge labels."""
     def __init__(self, input_dim, output_dim, dropout=0., act=tf.nn.relu, **kwargs):
         super(Graphite, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):
@@ -142,7 +142,7 @@ class Graphite(Layer):
         return outputs
 
 class GraphiteSparse(Layer):
-    """Basic graph convolution layer for undirected graph without edge labels."""
+    """Graphite layer for sparse inputs."""
     def __init__(self, input_dim, output_dim, dropout=0., act=tf.nn.relu, **kwargs):
         super(GraphiteSparse, self).__init__(**kwargs)
         with tf.variable_scope(self.name + '_vars'):

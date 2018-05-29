@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import networkx as nx
+import itertools
 
 
 def sparse_to_tuple(sparse_mx):
@@ -234,14 +235,17 @@ def read_siemens():
             edges = [n.strip('[]').strip().split(',') for n in edges]
             edges = [(int(n[0]), int(n[1])) for n in edges]
 
-        A = np.zeros((250, 250))
+        A = np.zeros((245, 245))
         for edge in edges:
           v1 = edge[0]
           v2 = edge[1]
           A[v1, v2] = 1
-        X = np.identity(250)
-        feature = 1 if i >= 143 else 0
-        X = np.hstack((X, np.zeros((A.shape[0], 1)) + feature))
+          A[v2, v1] = 1
+        X = np.identity(245)
+        indices = np.array([x for x in itertools.product(range(7), range(35))])
+        deg = np.sum(A, axis = 1, keepdims = True)
+        ones = np.ones((245, 1))
+        X = np.hstack((X, ones, deg))
 
         A = sp.csr_matrix(A)
         X = sp.csr_matrix(X)
@@ -253,7 +257,7 @@ def read_siemens():
 
 def load_siemens():
     As, Xs, labels = read_siemens()    
-    A_orig = [sparse_to_tuple(A + sp.eye(A.shape[0])) for A in As]
+    A_orig = [sparse_to_tuple(A) for A in As]
     A = [preprocess_graph(A) for A in As]
     X = [sparse_to_tuple(X.tocoo()) for X in Xs]
 
